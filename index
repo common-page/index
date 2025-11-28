@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>설치비 미리보기</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+
+
+
+#q3_1,
+#q3_1_1 {
+    display: none !important;
+}
+
+
+/* =================== [기본 스타일] =================== */
+body{font-family:'Noto Sans KR',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#fff;color:#222}
+h2{margin:0;text-align:center;background:#007bff;color:#fff;padding:20px 10px}
+.layout-wrapper{display:flex;justify-content:flex-start;align-items:flex-start;width:100%}
+.layout-left{flex:1;max-width:1200px;margin:0 auto;padding:0 20px;text-align:left}
+.container{width:100%;margin:40px auto 0;padding:0}
+
+/* =================== [기본 설치비 카드] =================== */
+.install-cards{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:16px;max-width:1200px;margin:0 auto}
+
+/* 제목 + base-head 덩어리 전체를 4컬럼 위에 가로로 꽉 차게 */
+.install-cards > h3,
+.install-cards > .base-head{
+  grid-column:1 / -1;
+}
+
+/* 제목 아래 설명 + 경고문구를 가로 배치 */
+.base-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin:0 0 16px;
+}
+
+/* 왼쪽 설명 문구 */
+.base-head .desc{
+  margin:0;
+  color:#555;
+}
+
+/* 오른쪽 경고 문구 */
+.base-head .notice{
+  margin:0;
+  padding:12px 16px;
+  border-radius:8px;
+  background:#f7f7f9;
+  color:#555;
+  font-size:13px;
+  line-height:1.6;
+  border:1px solid #e1e3e8;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  white-space:nowrap;
+}
+
+.base-head .notice-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  border:1px solid #d0d3db;
+  font-size:11px;
+  font-weight:600;
+  color:#777;
+  background:#fff;
+}
+
+/* 태블릿 & 모바일에서는 세로로 (p 밑에 경고문구) */
+@media (max-width:992px){
+  .base-head{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .base-head .notice{
+    white-space:normal;
+    margin-top:4px;
+  }
+}
+
+.card{min-width:0;border:1px solid #ddd;border-radius:10px;text-align:center;padding:20px;cursor:pointer;transition:.2s;background:#fff;display:flex;flex-direction:column;align-items:center}
+.card:hover{border-color:#007bff;box-shadow:0 0 10px rgba(0,0,0,.1)}
+.card.active{background:#eaf4ff;border-color:#007bff}
+.card h4{margin:10px 0 5px}
+.card img{width:100%;max-width:160px;max-height:140px;object-fit:contain;display:block;margin:0 auto 8px;border-radius:8px}
+@media (max-width:992px){.install-cards{grid-template-columns:repeat(2,minmax(220px,1fr))}}
+@media (max-width:576px){.install-cards{grid-template-columns:1fr}}
+
+/* =================== [옵션 박스] =================== */
+.option-box{background:#f9f9f9;border:1px solid #ddd;border-radius:8px;padding:24px 20px;max-width:1150px;width:100%;margin:24px auto 0;box-shadow:0 2px 6px rgba(0,0,0,.05);text-align:left}
+.install-cards .option-box{grid-column:1/-1}
+
+/* =================== [공통 버튼/행] =================== */
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-block;min-width:180px;text-align:center;padding:12px 16px;font-size:16px;font-weight:600;color:#fff;background:#007bff;border:none;border-radius:8px;cursor:pointer;transition:.2s}
+.btn:hover{background:#0056b3}
+.btn-outline{background:#fff;color:#007bff;border:1px solid #007bff}
+.btn-outline:hover{background:#eaf4ff}
+
+/* =================== [이미지 버튼 카드형 - 기본] =================== */
+.btn.btn-img,.btn-outline.btn-img{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:0;border-radius:12px;background:#fff;border:1px solid #007bff;overflow:hidden;transition:.2s;box-shadow:0 2px 5px rgba(0,0,0,.05)
+}
+.btn.btn-img:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,123,255,.18)}
+.btn-img .thumb{width:100%;aspect-ratio:4/3;overflow:hidden;background:#f2f2f2}
+.btn-img .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.btn-img .label{display:block;width:100%;background:#007bff;color:#fff;font-weight:700;padding:12px 10px;font-size:15px;line-height:1.35}
+
+/* ✅ 선택됐을 때(active) 전역 하이라이트 */
+.btn-img.active{
+  border-color:#0056b3;
+  transform:translateY(-3px);
+  box-shadow:0 10px 22px rgba(0,123,255,.25);
+}
+
+.btn-img.active .label{
+  background:#0056b3;
+  color:#fff;
+}
+/* =================== [3-2-1-1 / 3-2-1-2 / 3-2-2 전용 - 이미지 정리] =================== */
+#q3_2_1_1 .btn-img .thumb,
+#q3_2_1_2 .btn-img .thumb,
+#q3_2_2   .btn-img .thumb{
+  width:100%;
+  aspect-ratio:4/3;
+  overflow:hidden;
+  padding:12px;
+  margin-bottom:8px;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-sizing:border-box;
+}
+#q3_2_1_1 .btn-img .thumb img,
+#q3_2_1_2 .btn-img .thumb img,
+#q3_2_2   .btn-img .thumb img{
+  max-width:100%;
+  max-height:100%;
+  width:auto;
+  height:auto;
+  object-fit:contain;
+  display:block;
+}
+
+/* =================== [공통 섹션/문항] =================== */
+.section{margin-bottom:48px}
+.section h3{margin:0 0 10px}
+.desc{color:#555;margin:0 0 16px}
+.question{margin:18px 0;padding:20px;border:1px solid #eee;border-radius:10px;background:#f9f9f9}
+.question p{font-weight:bold;margin:0 0 12px}
+.subwrap{margin-top:12px;border-top:1px dashed #cfe2ff;padding-top:12px}
+
+/* =================== [입력/결과] =================== */
+input[type="number"]{width:100%;max-width:360px;padding:10px;font-size:16px;border:1px solid #ccc;border-radius:6px;margin-bottom:10px}
+#baseMoveResult{display:none;margin-top:14px;font-size:18px;font-weight:bold;color:#007bff}
+#resultBox{display:none;margin-top:24px;padding:20px;border:2px solid #007bff;border-radius:10px;background:#eaf4ff}
+#resultBox h3{margin-top:0;color:#007bff}
+
+/* ===== [예상 견적 표시 스타일] ===== */
+#resultText{ line-height:1.6; }
+#resultBox p{ margin:0; }
+#resultBox h3{ margin-bottom:10px; }
+#resultText strong{ font-weight:800; }
+
+/* =================== [CTA/로고] =================== */
+.cta{text-align:center;margin:30px auto 0}
+.cta a{display:inline-block;background:#007bff;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;margin:0 5px;transition:.2s}
+.cta a:hover{background:#0056b3}
+
+/* =================== [네비 버튼 중앙 정렬] =================== */
+.nav-row{
+  display:grid !important;
+  grid-template-columns: repeat(2, minmax(160px, auto));
+  justify-content:center;
+  justify-items:stretch;
+  gap:10px;
+  margin-top:8px;
+}
+.nav-row .btn,.nav-row .btn-outline{width:100%; min-width:unset; justify-content:center}
+
+/* =================== [반응형 그리드] =================== */
+#part3 .question .row,#typeButtons{
+  display:grid !important;
+  grid-template-columns: 1fr;
+  gap:16px;
+  justify-items:center;
+  justify-content:center;
+}
+@media (min-width:768px) and (max-width:1013.98px){
+  #part3 .question .row.cols-2,#typeButtons{grid-template-columns:repeat(2, minmax(260px, 320px))}
+  #part3 .question .row.cols-3{grid-template-columns:repeat(3, minmax(240px, 300px))}
+}
+@media (min-width:1014px){
+  #part3 .question .row.cols-2,#typeButtons{grid-template-columns:repeat(2, minmax(300px, 360px))}
+  #part3 .question .row.cols-3{grid-template-columns:repeat(3, minmax(300px, 360px))}
+}
+#part3 .question .row .btn,#part3 .question .row .btn-outline,#typeButtons .btn,#typeButtons .btn-outline{width:100%;min-width:unset;justify-content:center}
+
+.fade{opacity:0;transform:translateY(-6px);transition:opacity .2s,transform .2s}
+.fade.show{opacity:1;transform:none}
+
+/* =================== [특정 구간 네비 제거] =================== */
+#q3_1 .nav-row,#q3_1_1 .nav-row,#q3_2 .nav-row,#q3_2_1 .nav-row,#q3_2_2 .nav-row{display:none !important}
+
+/* =================== [멀티형 입력 2칸 레이아웃] =================== */
+#pipeInputs_multi .grid-2{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:768px){#pipeInputs_multi .grid-2{grid-template-columns:1fr 1fr}}
+#pipeInputs_multi label{display:block;margin:8px 0 4px}
+#pipeInputs_multi input{width:100%}
+
+
+/* =======================
+   🔵 평수 버튼(active) 하이라이트
+   ======================= */
+.btn.active {
+  background: #0056b3 !important;   /* 진한 파랑 */
+  color: #fff !important;
+  border-color: #0056b3 !important;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(0, 123, 255, 0.25);
+}
+
+
+
+</style>
+</head>
+
+<body>
+<h2>설치비 미리보기</h2>
+
+<div class="layout-wrapper">
+  <div class="layout-left">
+
+    <!-- ① 기본 설치비 -->
+    <div class="container">
+      <div class="install-cards">
+        <h3>① 기본 설치비</h3>
+
+        <!-- 제목 아래 설명 + 안내문 (데스크톱: 옆, 모바일: 아래) -->
+        <div class="base-head">
+          <p class="desc">
+            기본 설치비는 에어컨 종류와 평형에 따라 다릅니다. 아래의 에어컨 종류와 평형을 선택해주세요.
+          </p>
+
+          <p class="notice">
+            <span class="notice-icon">!</span>
+            <span>
+              <strong>상업용 및 천장형 에어컨은 별도 전화 상담 바랍니다.</strong>
+            </span>
+          </p>
+        </div>
+
+        <div class="card" onclick="showOptions('opt_wallCool', this, 'wallCool')">
+          <h4>벽걸이형(냉방전용)</h4>
+          <img src="wall_cool.png" alt="벽걸이형(냉방전용)">
+        </div>
+        <div class="card" onclick="showOptions('opt_wallHeat', this, 'wallHeat')">
+          <h4>벽걸이형(냉난방겸용)</h4>
+          <img src="wall_cool.png" alt="벽걸이형(냉난방겸용)">
+        </div>
+        <div class="card" onclick="showOptions('opt_stand', this, 'stand')">
+          <h4>가정용 스탠드형</h4>
+          <img src="stand_3.png" alt="가정용 스탠드형">
+        </div>
+        <div class="card" onclick="showOptions('opt_multi', this, 'multi')">
+          <h4>멀티형(2in1)</h4>
+          <img src="multi.png" alt="멀티형(2in1)">
+        </div>
+
+        <!-- 벽걸이 냉방 -->
+        <div id="opt_wallCool" class="option-box" style="display:none;">
+          <p>벽걸이(냉방전용) 평형을 선택해주세요.</p>
+          <div class="row">
+            <button class="btn" onclick="selectBasePrice('wallCool',150000,18000)">6~9평</button>
+            <button class="btn" onclick="selectBasePrice('wallCool',170000,20000)">10~14평</button>
+            <button class="btn" onclick="selectBasePrice('wallCool',190000,20000)">15~16평</button>
+          </div>
+        </div>
+
+        <!-- 벽걸이 냉난방 -->
+        <div id="opt_wallHeat" class="option-box" style="display:none;">
+          <p>벽걸이(냉난방겸용) 평형을 선택해주세요.</p>
+          <div class="row">
+            <button class="btn" onclick="selectBasePrice('wallHeat',200000,20000)">7~9평</button>
+            <button class="btn" onclick="selectBasePrice('wallHeat',230000,22000)">10~14평</button>
+            <button class="btn" onclick="selectBasePrice('wallHeat',250000,22000)">15~16평</button>
+          </div>
+        </div>
+
+        <!-- 스탠드 -->
+        <div id="opt_stand" class="option-box" style="display:none;">
+          <p>가정용 스탠드형 설치 비용</p>
+          <div class="row">
+            <button class="btn" onclick="selectBasePrice('stand',200000,25000)">₩200,000</button>
+          </div>
+        </div>
+
+        <!-- 멀티형 -->
+        <div id="opt_multi" class="option-box" style="display:none;">
+          <p>멀티형(2in1) 설치 비용</p>
+          <div class="row">
+            <button class="btn" onclick="selectBasePrice('multi',290000,18000,25000)">₩290,000</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="baseMoveResult">선택하신 기본설치 비용은 <span id="baseMovePrice"></span>원 입니다.</div>
+
+    <!-- ② 추가 설치비 -->
+    <div class="container" id="part3" style="display:none;">
+      <div class="section">
+        <h3>② 추가 설치비</h3>
+        <p class="desc">설치 환경에 따라 추가 비용이 발생할 수 있습니다. 아래 항목을 순서대로 선택해주세요.</p>
+
+        <!-- Q1 주차 -->
+        <div id="q1" class="question" style="display:block;">
+          <p>1. 주차 가능한가요?</p>
+          <div class="row cols-2">
+            <button class="btn btn-img" onclick="guardAndNext(this,'q1','q2','0')">
+              <span class="thumb"><img src="car.jpg" alt=""></span>
+              <span class="label">YES</span>
+            </button>
+            <button class="btn btn-img" onclick="guardAndNext(this,'q1','q2','20000')">
+              <span class="thumb"><img src="road.jpg" alt=""></span>
+              <span class="label">NO (주차 및 이동비 2만원 추가)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Q2 엘리베이터 -->
+        <div id="q2" class="question" style="display:none;">
+          <p>2. 엘리베이터(E/V) 이용 가능한가요?</p>
+          <div class="row cols-2">
+            <button class="btn btn-img" onclick="guardAndNext(this,'q2','q3','0')">
+              <span class="thumb"><img src="ev.jpg" alt=""></span>
+              <span class="label">YES</span>
+            </button>
+            <button class="btn btn-img" onclick="guardAndNext(this,'q2','q3','30000~50000')">
+              <span class="thumb"><img src="step.jpg" alt=""></span>
+              <span class="label">NO (지상 기준 3층부터 3~5만원 추가)</span>
+            </button>
+          </div>
+          <div class="nav-row">
+            <button class="btn btn-outline" onclick="goBack()">⬅ 이전</button>
+            <button class="btn btn-outline" onclick="goToStart()">⬅ 처음으로</button>
+          </div>
+        </div>
+
+        <!-- Q3 실외기 설치 -->
+        <div id="q3" class="question" style="display:none;">
+          <p>3. 실외기 설치 장소는?</p>
+          <div class="row cols-2">
+            <button class="btn btn-img" onclick="toQ3Indoor()">
+              <span class="thumb"><img src="brd2.jpg" alt=""></span>
+              <span class="label">실내</span>
+            </button>
+            <button class="btn btn-img" onclick="toQ3Outdoor()">
+              <span class="thumb"><img src="out.jpg" alt=""></span>
+              <span class="label">실외</span>
+            </button>
+          </div>
+
+          <div id="q3_sub" class="subwrap" style="display:none;">
+
+            <!-- 3-1 실내 베이스 -->
+            <div id="q3_1" class="question fade" style="display:none;">
+              <p>3-1. (실내) 베이스가 필요한가요?</p>
+              <div class="row cols-2">
+                <button class="btn btn-img" onclick="showFade('q3_1_1')">
+                  <span class="thumb"><img src="/" alt=""></span>
+                  <span class="label">YES</span>
+                </button>
+                <button class="btn btn-img" onclick="completeQ3Step(this,'q3_1','0')">
+                  <span class="thumb"><img src="/" alt=""></span>
+                  <span class="label">NO</span>
+                </button>
+              </div>
+
+              <!-- 3-1-1 베이스 금액 -->
+              <div id="q3_1_1" class="question fade" style="display:none;">
+                <p>3-1-1. 구매하실 베이스를 선택해주세요.</p>
+                <div class="row cols-3">
+                  <button class="btn btn-img" onclick="completeQ3Step(this,'q3_1_1','10000')">
+                    <span class="thumb"><img src="/" alt=""></span>
+                    <span class="label">1만원</span>
+                  </button>
+                  <button class="btn btn-img" onclick="completeQ3Step(this,'q3_1_1','30000')">
+                    <span class="thumb"><img src="/" alt=""></span>
+                    <span class="label">3만원</span>
+                  </button>
+                  <button class="btn btn-img" onclick="completeQ3Step(this,'q3_1_1','50000')">
+                    <span class="thumb"><img src="/" alt=""></span>
+                    <span class="label">5만원</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3-2 실외 앵글 -->
+            <div id="q3_2" class="question fade" style="display:none;">
+              <p>3-2. (실외) 앵글을 보유하고 있나요?</p>
+              <div class="row cols-2">
+                <button class="btn btn-img" onclick="chooseAngleHave(this)">
+                  <span class="thumb"><img src="angle2.jpg" alt=""></span>
+                  <span class="label">Yes</span>
+                </button>
+                <button class="btn btn-img" onclick="chooseAngleNeed(this)">
+                  <span class="thumb"><img src="angle3.jpg" alt=""></span>
+                  <span class="label">No</span>
+                </button>
+              </div>
+
+              <!-- 3-2-1 보유 → 상태 -->
+              <div id="q3_2_1" class="question fade" style="display:none;">
+                <p>3-2-1. (보유) 앵글 상태가 어떤가요?</p>
+                <div class="row cols-2">
+                  <button class="btn btn-img" onclick="showQ3_2_1_1(this)">
+                    <span class="thumb"><img src="notinstall3.jpg" alt=""></span>
+                    <span class="label">미설치</span>
+                  </button>
+                  <button class="btn btn-img" onclick="showQ3_2_1_2(this)">
+                    <span class="thumb"><img src="install2.jpg" alt=""></span>
+                    <span class="label">설치</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 3-2-1-1 (미설치) -->
+              <div id="q3_2_1_1" class="question fade" style="display:none;">
+                <p>3-2-1-1. (미설치시) 에어컨 종류를 선택해주세요.</p>
+                <div class="row cols-3">
+                  <button class="btn btn-img" onclick="completeQ3Step(this,'q3_2_1_1','70000')">
+                    <span class="thumb"><img src="wall_cool.png" alt=""></span>
+                    <span class="label">벽걸이형(7만원 추가)</span>
+                  </button>
+                  <button class="btn btn-img" onclick="completeQ3Step(this,'q3_2_1_1','90000')">
+                    <span class="thumb"><img src="stand_3.png" alt=""></span>
+                    <span class="label">가정용 스탠드형(9만원 추가)</span>
+                  </button>
+                  <button class="btn btn-img" onclick="completeQ3Step(this,'q3_2_1_1','90000')">
+                    <span class="thumb"><img src="multi.png" alt=""></span>
+                    <span class="label">멀티형(2in1) (9만원 추가)</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 3-2-1-2 (설치) -->
+              <div id="q3_2_1_2" class="question fade" style="display:none;">
+                <p>3-2-1-2. (설치시) 에어컨 종류를 선택해주세요.</p>
+                <div class="row cols-3">
+                  <button class="btn btn-img" onclick="completeQ3Step(this,'q3_2_1_2','30000~50000')">
+                    <span class="thumb"><img src="wall_cool.png" alt=""></span>
+                    <span class="label">벽걸이형(3~5만원 추가)</span>
+                  </button>
+                  <button class="btn btn-img" onclick="completeQ3Step(this,'q3_2_1_2','50000')">
+                    <span class="thumb"><img src="stand_3.png" alt=""></span>
+                    <span class="label">가정용 스탠드형(5만원 추가)</span>
+                  </button>
+                  <button class="btn btn-img" onclick="completeQ3Step(this,'q3_2_1_2','50000')">
+                    <span class="thumb"><img src="multi.png" alt=""></span>
+                    <span class="label">멀티형(2in1) (5만원 추가)</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 3-2-2 미보유 → 구매액 -->
+              <div id="q3_2_2" class="question fade" style="display:none;">
+                <p>3-2-2. (미보유시) 구매하실 에어컨 종류를 선택해주세요.</p>
+                <div class="row cols-2">
+                  <button class="btn btn-img" onclick="completeQ3Step(this,'q3_2_2','100000')">
+                    <span class="thumb"><img src="wall_cool.png" alt=""></span>
+                    <span class="label">벽걸이형 6~9평 (10만원 추가)</span>
+                  </button>
+                  <button class="btn btn-img" onclick="completeQ3Step(this,'q3_2_2','130000')">
+                    <span class="thumb"><img src="wall_cool.png" alt=""></span>
+                    <span class="label">벽걸이형 10~16평 (13만원 추가)</span>
+                  </button>
+                  <button class="btn btn-img" onclick="completeQ3Step(this,'q3_2_2','130000')">
+                    <span class="thumb"><img src="stand_3.png" alt=""></span>
+                    <span class="label">가정용 스탠드형 (13만원 추가)</span>
+                  </button>
+                  <button class="btn btn-img" onclick="completeQ3Step(this,'q3_2_2','130000')">
+                    <span class="thumb"><img src="multi.png" alt=""></span>
+                    <span class="label">멀티형(2in1) (13만원 추가)</span>
+                  </button>
+                </div>
+              </div>
+
+            </div><!-- /q3_2 -->
+
+          </div><!-- /q3_sub -->
+
+          <div class="nav-row">
+            <button class="btn btn-outline" onclick="goBack()">⬅ 이전</button>
+            <button class="btn btn-outline" onclick="goToStart()">⬅ 처음으로</button>
+          </div>
+        </div>
+
+        <!-- Q4 배관 길이 -->
+        <div id="q8" class="question" style="display:none;">
+          <p>4. (예상) 총 배관 길이는 몇 m인가요?</p>
+
+          <!-- 단일형 입력 -->
+          <input type="number" id="pipeLength" placeholder="예: 6 (m)" inputmode="numeric" min="0" step="1" />
+
+          <div id="pipeInfo_general">
+            <p class="desc" style="margin-top:10px;"><기본 작업에 배관 5m + 타공 1회가 포함됩니다.></p><br>
+            <p class="desc" style="margin-top:8px;">
+              ※배관 길이가 6m 이상일 경우, 1m 당 추가 금액이 발생합니다. <br></p>
+            <p style="font-weight: 400;">
+              * 벽걸이형(냉방 전용) <br>
+              - 6~9평: 18,000원 <br>
+              - 10~16평: 20,000원 </p><br>
+
+            <p style="font-weight: 400%;">
+              * 벽걸이형(냉난방 겸용) <br>
+              - 7~9평: 20,000원 <br>
+              - 10~16평: 22,000원 </p><br>
+
+            <p style="font-weight: 400%;">
+              * 스탠드형(냉방 전용) <br>
+              - 12~25평: 25,000원 <br> </p><br>
+
+            <p class="desc" style="margin-top:10px;">
+              ※배관 연장 시 냉매 보충은 필수입니다.<br> </p>
+
+            <p style="font-weight: 400%;">
+              - 각 추가 배관 5m 이하인 경우 30,000원 추가  <br>
+              - 각 추가 배관 5m 초과인 경우 50,000원 추가      <br>
+            </p>
+          </div>
+
+          <!-- 멀티형 전용 입력 (2칸) -->
+          <div id="pipeInputs_multi" style="display:none; margin-top:12px;">
+            <p style="margin:6px 0 6px;"><strong>*멀티형(벽걸이+스탠드)</strong> — 총 배관 길이를 각각 입력해주세요.</p>
+            <div class="grid-2">
+              <div>
+                <label>벽걸이형 총 배관 길이 (m)</label>
+                <input type="number" id="pipeLength_wall" placeholder="예: 6" inputmode="numeric" min="0" step="1" />
+              </div>
+              <div>
+                <label>스탠드형 총 배관 길이 (m)</label>
+                <input type="number" id="pipeLength_stand" placeholder="예: 8" inputmode="numeric" min="0" step="1" />
+              </div>
+            </div>
+            <p class="desc" style="margin-top:10px;"><기본 작업에 배관 5m + 타공 1회가 포함됩니다.></p><br>
+
+            <p class="desc" style="margin-top:8px;">
+              ※각 배관 길이가 6m 이상일 경우, 1m 당 추가 금액이 발생합니다. <br></p>
+            <p style="font-weight: 400%;">
+              * 멀티형(2in1) 기준 <br>
+              - 벽걸이형: 추가 1m당 18,000원 <br>
+              - 스탠드형: 추가 1m당 25,000원 </p><br>
+
+            <p class="desc" style="margin-top:10px;">
+              ※배관 연장 시 냉매 보충은 필수입니다.<br> </p>
+
+            <p style="font-weight: 400%;">
+              - 각 추가 배관 5m 이하인 경우 30,000원 추가  <br>
+              - 각 추가 배관 5m 초과인 경우 50,000원 추가      <br>
+            </p>
+          </div>
+
+          <div class="row" style="display:grid !important;grid-template-columns:1fr;justify-items:center;gap:12px;margin-top:12px;">
+            <button class="btn" onclick="finishPipe()">제출</button>
+          </div>
+        </div>
+
+        <!-- 결과 -->
+        <div id="resultBox">
+          <h3>🧾 예상 견적</h3>
+          <p id="resultText"></p>
+          <p style="margin-top:10px;color:#555;font-weight:bold;">※ 실제 현장 환경에 따라 달라질 수 있습니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 아래에 따로 있던 경고 p 태그는 삭제됨 -->
+
+    <div class="cta">
+      <a href="https://pf.kakao.com/_SpvFn" target="_blank" rel="noopener">카카오톡 문의하기</a>
+      <a href="tel:0517248176">전화 상담하기</a>
+    </div>
+    <br><br><br>
+    <div class="lastlogo">
+      <img src="logo.png" style="display:block;margin:0 auto;max-width:300px" alt="파란시스템 로고">
+    </div>
+  </div>
+</div>
+<br><br>
+
+<script>
+/* =================== 전역 스타일 주입 (btn-img 건들지 않음) =================== */
+(function injectGlobalStyles(){
+  const css = `
+  .global-nav{
+    position: static;
+    display:flex;justify-content:center;gap:10px;
+    margin-top:16px;padding:10px 0;border-top:1px solid #e5e7eb;
+    background:transparent;
+  }
+  .global-nav .btn,.global-nav .btn-outline{
+    background:#fff !important;color:#007bff;border:1px solid #007bff;
+    box-shadow:none !important;outline:none !important
+  }
+  .global-nav .btn:hover,.global-nav .btn-outline:hover{ background:#fff !important }
+
+  .nav-row{display:none !important}
+
+  .fade{opacity:0;transform:translateY(-6px);transition:opacity .4s ease,transform .4s ease}
+  .fade.show{opacity:1;transform:none}
+
+  .card.active{
+    background:#eaf4ff;border-color:#007bff;
+    box-shadow:0 8px 22px rgba(0,123,255,.25),0 2px 6px rgba(0,0,0,.08);
+    transform:translateY(-2px)
+  }
+  `;
+  const s=document.createElement('style'); s.textContent=css; document.head.appendChild(s);
+})();
+
+/* =================== fade =================== */
+const _fadeTimers = new Map();
+function showFade(id){
+  const el=document.getElementById(id); if(!el) return;
+  const t=_fadeTimers.get(id); if(t){clearTimeout(t);_fadeTimers.delete(id);}
+  el.style.display='block'; requestAnimationFrame(()=>el.classList.add('show'));
+}
+function hideFade(id){
+  const el=document.getElementById(id); if(!el) return;
+  if(getComputedStyle(el).display==='none') return;
+  el.classList.remove('show');
+  const prev=_fadeTimers.get(id); if(prev) clearTimeout(prev);
+  const to=setTimeout(()=>{ if(!el.classList.contains('show')) el.style.display='none'; _fadeTimers.delete(id); },440);
+  _fadeTimers.set(id,to);
+}
+// 즉시 숨김
+function forceHide(id){
+  const el=document.getElementById(id); if(!el) return;
+  const t=_fadeTimers.get(id); if(t){ clearTimeout(t); _fadeTimers.delete(id); }
+  el.classList.remove('show'); el.style.display='none';
+}
+
+/* =================== 상태 & 유틸 =================== */
+let basePrice=0,selectedACType=null,addMin=0,addMax=0,pipeRatePerM=0;
+const SHOW_ZERO_ITEMS=false;
+const historyStack=[],costStack=[],selections={},stepsOrder=[],addItems=[];
+function fmt(n){return Number(n||0).toLocaleString();}
+function parseRange(v){if(!v)return[0,0];const r=String(v).replace(/,/g,'');if(r.includes('~')){const[a,b]=r.split('~').map(Number);return[a||0,b||a||0];}const n=Number(r)||0;return[n,n];}
+function getBtnLabel(el){return(el?.querySelector?.('.label')?.innerText?.trim()||el?.innerText?.trim()||'').replace(/\s+/g,' ');}
+function scrollIntoViewSmooth(el){el?.scrollIntoView({behavior:'smooth',block:'start'});}
+function recomputeAddTotals(){addItems.length=0;addMin=0;addMax=0;for(const k of stepsOrder){const s=selections[k];if(!s)continue;addItems.push(s);addMin+=s.min||0;addMax+=s.max||0;}}
+function normalizeItem({label,min,max,stepId}){if(stepId==='q3_2_2'&&/^(\d+)\s*만원$/.test(label))label='앵글 '+label;return{label,min,max,stepId};}
+function formatItemLine(i){const{label,min,max}=i;if(!SHOW_ZERO_ITEMS&&min===0&&max===0)return null;const p=(min===max)?`${fmt(min)}원`:`${fmt(min)}원 ~ ${fmt(max)}원`;return`${label}: ${p}`;}
+function upsertSelection(id,label,min,max){
+  const ex=!!selections[id];
+  selections[id]={label,min,max,stepId:id};
+  if(!ex){stepsOrder.push(id);historyStack.push(id);costStack.push([min,max]);}
+  recomputeAddTotals();renderResultIfOpen();
+}
+
+/* 단계 리셋 */
+function resetFrom(startId){
+  const order = [
+    'q1','q2','q3','q3_sub',
+    'q3_1','q3_1_1',
+    'q3_2','q3_2_1','q3_2_1_1','q3_2_1_2','q3_2_2',
+    'q8'
+  ];
+  const startIdx = order.indexOf(startId);
+  if (startIdx === -1) return;
+
+  for (let i = startIdx + 1; i < order.length; i++){
+    const id = order[i];
+    const el = document.getElementById(id);
+    if (!el) continue;
+
+    if (el.classList && el.classList.contains('fade')) {
+      forceHide(id);
+    } else {
+      el.style.display = 'none';
+    }
+    el.querySelectorAll?.('.btn,.btn-img')?.forEach(b=>b.classList.remove('active'));
+    if (selections[id]) delete selections[id];
+  }
+
+  while (historyStack.length) {
+    const last = historyStack[historyStack.length - 1];
+    if (order.indexOf(last) > startIdx) {
+      historyStack.pop();
+      costStack.pop();
+    } else break;
+  }
+
+  recomputeAddTotals();
+  renderResultIfOpen();
+}
+
+/* =================== 기본설치 =================== */
+const isMulti = () => selectedACType === 'multi';
+function showPipeInputs(){
+  const one   = document.getElementById('pipeLength');
+  const multi = document.getElementById('pipeInputs_multi');
+  const info  = document.getElementById('pipeInfo_general');
+
+  if(isMulti()){
+    if(one)   one.style.display   = 'none';
+    if(multi) multi.style.display = 'block';
+    if(info)  info.style.display  = 'none';
+  }else{
+    if(one)   one.style.display   = 'block';
+    if(multi) multi.style.display = 'none';
+    if(info)  info.style.display  = 'block';
+  }
+}
+function showOptions(opt,card,type){
+  document.querySelectorAll('.option-box').forEach(e=>e.style.display='none');
+  document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
+  card.classList.add('active');
+  selectedACType=type||null;basePrice=0;pipeRatePerM=0;
+  document.getElementById('baseMoveResult').style.display='none';
+  lockAdditional();
+  addItems.length=0;for(const k in selections)delete selections[k];stepsOrder.length=0;
+  document.getElementById(opt).style.display='block';
+}
+function selectBasePrice(type, price, rate){
+  // 🔹 1) 어떤 버튼을 눌렀는지 찾아서 active 클래스 관리
+  let btn = null;
+  if (window.event) {
+    btn = window.event.currentTarget || window.event.target;
+  }
+  if (btn) {
+    // 같은 옵션 박스 안의 다른 버튼 active 제거
+    const box = btn.closest('.option-box');
+    if (box) {
+      box.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+    }
+    // 지금 클릭한 버튼만 active
+    btn.classList.add('active');
+  }
+
+  // 🔹 2) 원래 하던 기본 설치비 로직 그대로 유지
+  selectedACType = type;
+  basePrice      = +price || 0;
+  pipeRatePerM   = +rate  || 0;
+
+  document.getElementById('baseMovePrice').innerText = fmt(basePrice);
+  document.getElementById('baseMoveResult').style.display = 'block';
+
+  unlockAdditional();
+  showPipeInputs();
+  scrollIntoViewSmooth(document.getElementById('part3'));
+  renderResultIfOpen();
+}
+
+/* =================== 추가설치 공통 =================== */
+function guardAndNext(el,cur,nxt,cost){
+  if(!isAdditionalUnlocked()) return alert('먼저 ① 기본 설치비를 선택해주세요.');
+  nextQuestion(el,cur,nxt,cost);
+}
+function nextQuestion(el,cur,nxt,cost){
+  resetFrom(cur);
+  const [min,max]=parseRange(cost); const label=getBtnLabel(el);
+  upsertSelection(cur,label,min,max);
+  const stepRoot=document.getElementById(cur);
+  stepRoot?.querySelectorAll('.btn,.btn-img').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+
+  const next=document.getElementById(nxt);
+  if(next){
+    if(next.classList.contains('fade')) showFade(nxt); else next.style.display='block';
+    if(cur==='q2' && nxt==='q3'){
+      scrollIntoViewSmooth(next);
+      setTimeout(()=>{ window.scrollBy({top:80,left:0,behavior:'smooth'}); },120);
+    }else{
+      scrollIntoViewSmooth(next);
+    }
+    positionNav(next);
+  }
+}
+
+/* ====== Q3(실내/실외) ====== */
+function _markQ3ChoiceActive(clickedBtn){
+  const group=document.querySelector('#q3 .row'); if(!group) return;
+  group.querySelectorAll('.btn,.btn-img').forEach(b=>b.classList.remove('active'));
+  if(clickedBtn) clickedBtn.classList.add('active');
+}
+function _getClickedBtnFromInlineEvent(){
+  const ev=window.event; if(!ev) return null;
+  const target=ev.target||ev.srcElement;
+  return target?.closest?.('.btn,.btn-img')||null;
+}
+// ✅ 실내 선택 시: 실내로 선택만 기록하고, 바로 Q4(배관 길이)로 이동
+function toQ3Indoor(){
+  if(!isAdditionalUnlocked()) {
+    alert('먼저 ① 기본 설치비를 선택해주세요.');
+    return;
+  }
+
+  const btn = _getClickedBtnFromInlineEvent();
+  _markQ3ChoiceActive(btn);
+
+  // Q3 이후 단계들 초기화
+  resetFrom('q3');
+
+  // Q3 선택값(실내, 추가비용 0원) 저장
+  upsertSelection('q3', '실내', 0, 0);
+
+  // 실내 관련 하위 질문들은 강제로 숨김
+  forceHide('q3_1');
+  forceHide('q3_1_1');
+  forceHide('q3_2');
+  forceHide('q3_2_1');
+  forceHide('q3_2_1_1');
+  forceHide('q3_2_1_2');
+  forceHide('q3_2_2');
+
+  // Q3 섹션은 그대로 보여두고, 바로 Q4로 이동
+  const q3 = document.getElementById('q3');
+  if(q3) q3.style.display = 'block';
+
+  const q4 = document.getElementById('q8');
+  if(q4){
+    q4.style.display = 'block';
+    scrollIntoViewSmooth(q4);
+    positionNav(q4);
+  }
+
+  // 결과 박스 열려있으면 합계 다시 계산
+  renderResultIfOpen();
+}
+function toQ3Outdoor(){
+  if(!isAdditionalUnlocked()) return alert('먼저 기본 설치비를 선택해주세요.');
+  const btn=_getClickedBtnFromInlineEvent(); _markQ3ChoiceActive(btn);
+  resetFrom('q3'); showQ3('out');
+}
+function showQ3(mode){
+  const q3=document.getElementById('q3'), sub=document.getElementById('q3_sub');
+  q3.style.display='block'; sub.style.display='block';
+  if(mode==='in'){
+    forceHide('q3_2'); forceHide('q3_2_1'); forceHide('q3_2_2'); forceHide('q3_2_1_1'); forceHide('q3_2_1_2');
+    showFade('q3_1'); positionNav(document.getElementById('q3_1'));
+  }else{
+    forceHide('q3_1'); forceHide('q3_1_1');
+    showFade('q3_2'); positionNav(document.getElementById('q3_2'));
+  }
+  scrollIntoViewSmooth(q3);
+}
+
+/* ====== 3-2 Yes/No ====== */
+function chooseAngleHave(btn){
+  resetFrom('q3_2');
+  const root=document.getElementById('q3_2');
+  root?.querySelectorAll('.btn,.btn-img').forEach(b=>b.classList.remove('active'));
+  btn?.classList.add('active');
+  forceHide('q3_2_2'); forceHide('q3_2_1_1'); forceHide('q3_2_1_2');
+  showFade('q3_2_1');
+  scrollIntoViewSmooth(document.getElementById('q3_2_1')); positionNav(document.getElementById('q3_2_1'));
+}
+function chooseAngleNeed(btn){
+  resetFrom('q3_2');
+  const root=document.getElementById('q3_2');
+  root?.querySelectorAll('.btn,.btn-img').forEach(b=>b.classList.remove('active'));
+  btn?.classList.add('active');
+  forceHide('q3_2_1'); forceHide('q3_2_1_1'); forceHide('q3_2_1_2');
+  showFade('q3_2_2');
+  scrollIntoViewSmooth(document.getElementById('q3_2_2')); positionNav(document.getElementById('q3_2_2'));
+}
+
+/* === 3-2-1 하위 === */
+function showQ3_2_1_1(btn){
+  resetFrom('q3_2_1');
+  const root=document.getElementById('q3_2_1');
+  root?.querySelectorAll('.btn,.btn-img').forEach(b=>b.classList.remove('active'));
+  btn?.classList.add('active');
+  forceHide('q3_2_1_2'); showFade('q3_2_1_1');
+  scrollIntoViewSmooth(document.getElementById('q3_2_1_1')); positionNav(document.getElementById('q3_2_1_1'));
+}
+function showQ3_2_1_2(btn){
+  resetFrom('q3_2_1');
+  const root=document.getElementById('q3_2_1');
+  root?.querySelectorAll('.btn,.btn-img').forEach(b=>b.classList.remove('active'));
+  btn?.classList.add('active');
+  forceHide('q3_2_1_1'); showFade('q3_2_1_2');
+  scrollIntoViewSmooth(document.getElementById('q3_2_1_2')); positionNav(document.getElementById('q3_2_1_2'));
+}
+
+/* === 최종 선택 === */
+function completeQ3Step(el,id,cost){
+  resetFrom(id);
+  const[min,max]=parseRange(cost); const label=getBtnLabel(el);
+  upsertSelection(id,label,min,max);
+  const stepRoot=document.getElementById(id);
+  stepRoot?.querySelectorAll('.btn,.btn-img').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+
+  const q4=document.getElementById('q8'); q4.style.display='block';
+  scrollIntoViewSmooth(q4); positionNav(q4);
+}
+
+/* =================== 결과 계산 =================== */
+function refillFee(extraM){
+  if(extraM<=0) return 0;
+  return extraM<=5 ? 30000 : 50000;
+}
+function buildEstimateHTML(len){
+  const extra=Math.max(0,len-5); let per=0,ref=0;
+  const pipeType=['wallCool','wallHeat','stand'].includes(selectedACType);
+  if(pipeType&&extra>0){ per=(pipeRatePerM||0)*extra; ref=refillFee(extra); }
+
+  const addTMin=addMin+per+ref, addTMax=addMax+per+ref;
+  const grandMin=basePrice+addTMin, grandMax=basePrice+addTMax;
+
+  const lines=[];
+  lines.push(`[기본 설치비]: ${fmt(basePrice)}원`, '');
+  const rendered=addItems.map(normalizeItem).map(formatItemLine).filter(Boolean);
+  lines.push('[추가 설치비]'); if(rendered.length) lines.push(rendered.join('<br>')); lines.push('');
+
+  if(pipeType){
+    if(extra>0){
+      lines.push(`배관 연장: ${extra}m × ${fmt(pipeRatePerM)}원 = ${fmt(per)}원`,
+                 `냉매 보충: ${fmt(ref)}원`);
+    }else{
+      lines.push(`배관 연장: 없음 (총 ${len}m, 기본 5m 포함)`);
+    }
+  }else{
+    lines.push('배관 추가단가: 멀티형(2in1) — 벽걸이 18,000원/m, 스탠드 25,000원/m (아래 입력으로 계산)');
+  }
+  lines.push('');
+
+  if(addTMin===addTMax){
+    lines.push(`합계(추가 설치비): ${fmt(addTMin)}원`, '',
+               `<strong>기본 설치비 + 추가 설치비 합계: ${fmt(grandMin)}원</strong>`);
+  }else{
+    lines.push(`합계(추가 설치비): ${fmt(addTMin)}원 ~ ${fmt(addTMax)}원`, '',
+               `<strong>기본 설치비 + 추가 설치비 합계: ${fmt(grandMin)}원 ~ ${fmt(grandMax)}원</strong>`);
+  }
+  return lines.map(l=>l===''?'<br>':l).join('<br>');
+}
+function buildEstimateHTMLMulti(wallLen, standLen){
+  const wExtra = Math.max(0, (parseInt(wallLen)||0) - 5);
+  const sExtra = Math.max(0, (parseInt(standLen)||0) - 5);
+  const wPer   = wExtra * 18000;
+  const sPer   = sExtra * 25000;
+  const wRef   = refillFee(wExtra);
+  const sRef   = refillFee(sExtra);
+
+  const per = wPer + sPer;
+  const ref = wRef + sRef;
+
+  const rendered = addItems.map(normalizeItem).map(formatItemLine).filter(Boolean);
+
+  const addTMin = addMin + per + ref;
+  const addTMax = addMax + per + ref;
+  const grandMin = basePrice + addTMin;
+  const grandMax = basePrice + addTMax;
+
+  const lines = [];
+  lines.push(`[기본 설치비]: ${fmt(basePrice)}원`, '');
+  lines.push('[추가 설치비]'); if(rendered.length) lines.push(rendered.join('<br>')); if(!rendered.length) lines.push('(기타 항목 없음)');
+  lines.push('',
+    `벽걸이형 배관 연장: ${wExtra}m × 18,000원 = ${fmt(wPer)}원`,
+    `스탠드형 배관 연장: ${sExtra}m × 25,000원 = ${fmt(sPer)}원`,
+    `냉매 보충비(벽걸이): ${fmt(wRef)}원`,
+    `냉매 보충비(스탠드): ${fmt(sRef)}원`,
+    ''
+  );
+
+  if(addTMin===addTMax){
+    lines.push(`합계(추가 설치비): ${fmt(addTMin)}원`, '',
+               `<strong>기본 설치비 + 추가 설치비 합계: ${fmt(grandMin)}원</strong>`);
+  }else{
+    lines.push(`합계(추가 설치비): ${fmt(addTMin)}원 ~ ${fmt(addTMax)}원`, '',
+               `<strong>기본 설치비 + 추가 설치비 합계: ${fmt(grandMin)}원 ~ ${fmt(grandMax)}원</strong>`);
+  }
+  return lines.map(l=>l===''?'<br>':l).join('<br>');
+}
+function renderResultIfOpen(){
+  const box=document.getElementById('resultBox'); if(!box||box.style.display==='none')return;
+  if(isMulti()){
+    const wl = parseInt((document.getElementById('pipeLength_wall')?.value || '0')) || 0;
+    const sl = parseInt((document.getElementById('pipeLength_stand')?.value || '0')) || 0;
+    document.getElementById('resultText').innerHTML = buildEstimateHTMLMulti(wl, sl);
+  }else{
+    const len=parseInt((document.getElementById('pipeLength')?.value || '0').replace(/[^0-9]/g,''))||0;
+    document.getElementById('resultText').innerHTML=buildEstimateHTML(len);
+  }
+}
+function finishPipe(){
+  if(!isAdditionalUnlocked()) return alert('먼저 ① 기본 설치비를 선택해주세요.');
+  if(isMulti()){
+    const wl = parseInt((document.getElementById('pipeLength_wall')?.value || '0')) || 0;
+    const sl = parseInt((document.getElementById('pipeLength_stand')?.value || '0')) || 0;
+    document.getElementById('resultText').innerHTML = buildEstimateHTMLMulti(wl, sl);
+  }else{
+    const len = parseInt((document.getElementById('pipeLength')?.value || '0').replace(/[^0-9]/g,'')) || 0;
+    document.getElementById('resultText').innerHTML = buildEstimateHTML(len);
+  }
+  const box=document.getElementById('resultBox'); box.style.display='block';
+  scrollIntoViewSmooth(box); positionNav(box);
+}
+
+/* =================== 네비게이션 =================== */
+function goBack(){
+  if(!historyStack.length) return;
+  const prev=historyStack.pop(); costStack.pop(); delete selections[prev];
+  recomputeAddTotals(); renderResultIfOpen();
+
+  const nextMap={q1:'q2', q2:'q3'};
+  if(prev.startsWith('q3')) document.getElementById('q8').style.display='none';
+  else{
+    const hide=nextMap[prev]; if(hide) document.getElementById(hide).style.display='none';
+    document.getElementById('q8').style.display='none';
+  }
+  document.getElementById('resultBox').style.display='none';
+
+  const last=document.querySelector('#part3 .question[style*="block"]:last-of-type')||document.getElementById('q1');
+  positionNav(last);
+}
+function goToStart(){
+  historyStack.length=0; costStack.length=0; stepsOrder.length=0;
+  for(const k in selections) delete selections[k];
+  addMin=0; addMax=0; addItems.length=0;
+
+  document.getElementById('resultBox').style.display='none';
+  ['q2','q3','q8'].forEach(id=>{const el=document.getElementById(id); if(el) el.style.display='none';});
+  if(isAdditionalUnlocked()) document.getElementById('q1').style.display='block';
+  positionNav(document.getElementById('q1'));
+}
+
+/* =================== 잠금/해제 =================== */
+function lockAdditional(){
+  const sec=document.getElementById('part3'); if(sec) sec.style.display='none';
+  historyStack.length=0; costStack.length=0; stepsOrder.length=0; addMin=0; addMax=0;
+  for(const k in selections) delete selections[k];
+  ['q1','q2','q3','q8'].forEach(id=>{const el=document.getElementById(id); if(el) el.style.display=(id==='q1'?'block':'none');});
+  ['q3_1','q3_1_1','q3_2','q3_2_1','q3_2_1_1','q3_2_1_2','q3_2_2'].forEach(id=>forceHide(id));
+  document.getElementById('resultBox').style.display='none';
+  positionNav(document.getElementById('q1'));
+}
+function unlockAdditional(){
+  const s=document.getElementById('part3'); if(s) s.style.display='block';
+  document.getElementById('q1').style.display='block';
+  positionNav(document.getElementById('q1'));
+}
+function isAdditionalUnlocked(){ return basePrice>0 && !!selectedACType; }
+
+/* =================== 전역 네비 =================== */
+function ensureGlobalNav(){
+  let nav=document.querySelector('.global-nav');
+  if(!nav){
+    nav=document.createElement('div');
+    nav.className='global-nav';
+    nav.innerHTML=`<button class="btn btn-outline" id="gn-back">⬅ 이전</button>
+                   <button class="btn btn-outline" id="gn-home">↩ 처음으로</button>`;
+    document.body.appendChild(nav);
+    nav.querySelector('#gn-back').addEventListener('click',goBack);
+    nav.querySelector('#gn-home').addEventListener('click',goToStart);
+  }
+  return nav;
+}
+function positionNav(targetEl){
+  const nav=ensureGlobalNav(); if(!targetEl) return; targetEl.after(nav);
+}
+
+/* =================== 초기화 =================== */
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('button:not([type])').forEach(b=>b.type='button');
+  ensureGlobalNav(); lockAdditional(); showPipeInputs();
+
+  // 3-2 Yes/No 버튼 전용 연결(보호)
+  const q32 = document.querySelector('#q3_2 .row');
+  if(q32){
+    const yesBtn = q32.children[0];
+    const noBtn  = q32.children[1];
+    if(yesBtn){ yesBtn.onclick = (e)=>{ e.preventDefault(); chooseAngleHave(yesBtn); }; }
+    if(noBtn){  noBtn.onclick  = (e)=>{ e.preventDefault(); chooseAngleNeed(noBtn);  }; }
+  }
+});
+
+/* =================== q3_2_2 4/2/1 컬럼 반응형 =================== */
+function updateQ322Layout() {
+  const row = document.querySelector('#q3_2_2 .row');
+  if (!row) return;
+  row.style.display = 'grid';
+  row.style.gap = '16px';
+
+  let cols = 1;
+  if (window.innerWidth >= 1024) {
+    cols = 4;
+  } else if (window.innerWidth >= 600) {
+    cols = 2;
+  } else {
+    cols = 1;
+  }
+  row.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+}
+window.addEventListener('load', updateQ322Layout);
+window.addEventListener('resize', updateQ322Layout);
+
+
+
+</script>
+</body>
+</html>
